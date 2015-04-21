@@ -10,9 +10,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <GL/freeglut.h>
-#include <uv_face_detect/bBox.h>
-#include <uv_face_detect/FaceDetected.h>
 #include <uv_msgs/FacesDetected.h>
+#include <uv_msgs/ImageBoundingBox.h>
 #include <glip.h>
 
 #define yMin -1.20

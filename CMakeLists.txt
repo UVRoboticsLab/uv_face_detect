@@ -33,7 +33,7 @@ add_definitions(${GLUT_DEFINITIONS})
 #DIA libraries (gl3DCommon)
 include_directories(/usr/local/dia/include)
 link_directories(/usr/local/dia/lib)
-set(DIALIBS glip gl3DCommon 3DGeom cvDia)
+set(DIALIBS glip cvDia)
 set(LIBS ${DIALIBS} ${LIBS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
