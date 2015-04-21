@@ -52,6 +52,8 @@ int fillFacesBoundingBoxes(CvRect rect)
  
   bBoxfaces.center.u=x+w/2;
   bBoxfaces.center.v=y+h/2;
+  bBoxfaces.width=w;
+  bBoxfaces.height=h;
   bBoxfaces.cornerPoints[0].u=x;
   bBoxfaces.cornerPoints[0].v=y;
   bBoxfaces.cornerPoints[1].u=x+w;
