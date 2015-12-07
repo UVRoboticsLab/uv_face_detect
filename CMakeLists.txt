@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   uv_msgs
   cv_bridge
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -127,7 +128,8 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-add_executable(uv_face_detect src/uv_face_detect.cpp)
+add_executable(uv_glip_face_detect src/uv_face_detect.cpp)
+add_executable(uv_face_detect src/uv_face_detect_wo_display.cpp)
 
 #add_executable(uv_3DfaceSegment src/uv_3DFaceSegment.cpp)
 ## Add cmake target dependencies of the executable/library
@@ -135,10 +137,13 @@ add_executable(uv_face_detect src/uv_face_detect.cpp)
 # add_dependencies(uv_face_detect_node uv_face_detect_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(uv_face_detect
+target_link_libraries(uv_glip_face_detect
   ${catkin_LIBRARIES} ${LIBS} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} m 
 )
 
+target_link_libraries(uv_face_detect
+  ${catkin_LIBRARIES} ${LIBS} 
+)
 #target_link_libraries(uv_3DfaceSegment
 #   ${catkin_LIBRARIES} ${LIBS} m 
 #)
