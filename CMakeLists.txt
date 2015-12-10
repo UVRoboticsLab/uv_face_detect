@@ -128,8 +128,8 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-add_executable(uv_glip_face_detect src/uv_face_detect.cpp)
-add_executable(uv_face_detect src/uv_face_detect_wo_display.cpp)
+add_executable(uv_glip_face_detect src/uv_glip_face_detect.cpp)
+add_executable(uv_face_detect src/uv_face_detect.cpp)
 
 #add_executable(uv_3DfaceSegment src/uv_3DFaceSegment.cpp)
 ## Add cmake target dependencies of the executable/library
