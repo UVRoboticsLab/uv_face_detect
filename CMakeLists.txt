@@ -86,7 +86,9 @@ set(LIBS ${DIALIBS} ${LIBS})
 #   Action1.action
 #   Action2.action
 # )
-
+#generate_dynamic_reconfigure_options( cfg/pkg_parameters.cfg) 
+#include_directories() 
+#gencfg()
 ## Generate added messages and services with any dependencies listed here
 #generate_messages(
 #   DEPENDENCIES
@@ -118,9 +120,10 @@ CATKIN_DEPENDS roscpp rospy std_msgs uv_msgs message_runtime
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+#include_directories(
+#  ${catkin_INCLUDE_DIRS}
+#  ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake
+#)
 
 ## Declare a cpp library
 # add_library(uv_face_detect
@@ -134,7 +137,7 @@ add_executable(uv_face_detect src/uv_face_detect.cpp)
 #add_executable(uv_3DfaceSegment src/uv_3DFaceSegment.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(uv_face_detect_node uv_face_detect_generate_messages_cpp)
+#add_dependencies(uv_face_detect uv_face_detect_gencfg)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(uv_glip_face_detect

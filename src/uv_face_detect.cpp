@@ -12,6 +12,7 @@
 #include <uv_msgs/ImageBoundingBox.h>
 
 #define default_ID "camera"
+#define default_topic "/camera/image_rect_color"
 
 ros::Publisher _pub1,_pub2;
 ros::Subscriber sub;
@@ -127,12 +128,19 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "uv_face_detect");  
   ros::NodeHandle _nh;
+  string topic;
+
+  _nh.getParam("uv_face_detect/image",topic);
+
+  if (topic.size()==0) topic=default_topic;
+    std::cout << topic << std::endl;
 
   cvDiaInitPeopleDet(40/imgRedFactor,100/imgRedFactor,haarCascade);
-
-  sub = _nh.subscribe("/camera/rgb/image_rect_color", 1, faceDetectCallback);
+  
+  sub = _nh.subscribe(topic, 1, faceDetectCallback);
   _pub1=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
   _pub2=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
+  
 
   while (ros::ok())
     { 
