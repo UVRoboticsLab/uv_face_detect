@@ -131,9 +131,7 @@ int main(int argc, char **argv)
   string topic;
 
   _nh.getParam("uv_face_detect/image",topic);
-
   if (topic.size()==0) topic=default_topic;
-    std::cout << topic << std::endl;
 
   cvDiaInitPeopleDet(40/imgRedFactor,100/imgRedFactor,haarCascade);
   
@@ -141,7 +139,6 @@ int main(int argc, char **argv)
   _pub1=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
   _pub2=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
   
-
   while (ros::ok())
     { 
       ros::spinOnce();

@@ -3,7 +3,6 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <cvDia.h>
 #include <opencv/cv.h>
@@ -14,12 +13,15 @@
 #include <uv_msgs/ImageBoundingBox.h>
 #include <glip.h>
 
-#define yMin -1.20
-#define yMax 8.0
 #define default_ID "camera"
+#define default_topic "/camera/image_rect_color"
+
+ros::Publisher _pub1,_pub2;
+ros::Subscriber sub;
 
 namespace enc = sensor_msgs::image_encodings;
 using namespace cv;
+
 int peopleFound=0,nFaces,notValidtd;
 int window;
 int fbbData[128],noFacesData[128];
@@ -108,34 +110,24 @@ int getFacesData()
 }
 
 
-void callback(const sensor_msgs::ImageConstPtr& msg)
+void faceDetectCallback(const sensor_msgs::ImageConstPtr& msg)
 {
   IplImage* iplImg;
   Mat tempImg;
 
-  ros::NodeHandle _nh1,_nh2;
-  ros::Publisher _pub1,_pub2;
+  cv_bridge::CvImageConstPtr cv_ptr;
 
-  _pub1=_nh1.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
-  //  cv_bridge::CvImagePtr cv_ptr;
-  _pub2=_nh2.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
-
-  cv_bridge::CvImagePtr cv_ptr;
-  try { 
-    cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::RGB8);
+ try { 
+    cv_ptr = cv_bridge::toCvShare(msg,enc::RGB8);
   } catch (cv_bridge::Exception& e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return;
   }
 
-  //  image.imageData=(char*)cv_ptr->image.imageData;
-  //  cvImage->imageData=(char*)cv_ptr->image.data;
   imageGlip->data=cv_ptr->image.data;
 
   iplImg=cvCreateImage(cvSize(imageGlip->width/2,imageGlip->height/2),IPL_DEPTH_8U,3);
-  // cvtColor(cv_ptr->image,cv_ptr->image,CV_BGR2RGB);
   resize(cv_ptr->image,tempImg,cvSize(imageGlip->width/2,imageGlip->height/2));//,0,0,CV_INTER_LINEAR);
-  
   iplImg->imageData = (char *) tempImg.data;
   peopleFound=cvDiaFindFaces(iplImg,&nFaces,&bBfaces,&rectNoFaces);
 
@@ -188,9 +180,15 @@ static void keyboard ( unsigned char key, int x, int y )
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "uv_face_detect");  
+  ros::NodeHandle _nh;
+  string topic;
+
   glutInitWindowSize(640,480);
   glutInit(&argc,argv);
   glutInitDisplayMode (GLUT_RGB);
+
+  _nh.getParam("uv_face_detect/image",topic);
+  if (topic.size()==0) topic=default_topic;
 
   imageGlip=(glipImageSt*)glipCreateImage(640,480,1,GLIP_RGB,GL_UNSIGNED_BYTE);
   imageGlip->signY=-1;
@@ -199,15 +197,16 @@ int main(int argc, char **argv)
   noFaces=(glipDataSt*)glipCreateDataSt(0,2,2,GLIP_COLOR_RED,GLIP_LINES,GLIP_INT,noFacesData);
 
   cvDiaInitPeopleDet(40/imgRedFactor,100/imgRedFactor,fileName);
-
-  ros::NodeHandle nh_;
-  ros::Subscriber sub;
-  sub = nh_.subscribe("/camera/rgb/image_rect_color", 1, callback);
   window=glipDisplayImage(imageGlip,"Camera Image",0);
   glipDrawInImage(window,faceBBox);
   glipDrawInImage(window,noFaces);
   glutKeyboardFunc(keyboard);
- 
+
+
+   sub = _nh.subscribe(topic, 1, faceDetectCallback);
+  _pub1=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
+  _pub2=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
+
   while (ros::ok())
     { 
       ros::spinOnce();
