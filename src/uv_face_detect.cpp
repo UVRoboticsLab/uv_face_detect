@@ -2,6 +2,8 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/Image.h>
+#include <image_transport/image_transport.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <cvDia.h>
@@ -12,23 +14,26 @@
 #include <uv_msgs/ImageBoundingBox.h>
 
 #define default_ID "camera"
-#define default_topic "/camera/image_rect_color"
+#define default_topic "/camera/rgb/image_rect_color"
 
 ros::Publisher _pub1,_pub2;
 ros::Subscriber sub;
+image_transport::Publisher pub;
 
 namespace enc = sensor_msgs::image_encodings;
 using namespace cv;
 
+bool exportFaceImages=true;
 int peopleFound=0,nFaces,notValidtd;
 int imgRedFactor = 2;
 CvRect *bBfaces,*rectNoFaces;  
-Mat image;
+Mat image,face;
 char haarCascade[]="/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml";
 
 uv_msgs::FacesDetected faces;
 uv_msgs::FacesDetected notValidFaces;
 uv_msgs::ImageBoundingBox  bBoxfaces;
+sensor_msgs::ImagePtr faceImage; 
 
 /**************************************************/
 
@@ -80,10 +85,12 @@ int getFacesData()
 void faceDetectCallback(const sensor_msgs::ImageConstPtr& msg)
 {
   IplImage* iplImg;
-  Mat tempImg;
+  Mat tempImg,face;
   int width, height;
 
   cv_bridge::CvImageConstPtr cv_ptr;
+  Rect faceRect;
+
 
   try { 
     cv_ptr = cv_bridge::toCvShare(msg,enc::RGB8);
@@ -111,6 +118,14 @@ void faceDetectCallback(const sensor_msgs::ImageConstPtr& msg)
     getFacesData();
     _pub1.publish(faces);
     faces.faces.clear(); 
+    faceRect=Rect(bBfaces[0].x*2,bBfaces[0].y*2,bBfaces[0].width*2,bBfaces[0].height*2);
+    //   Size tempSize=cvSize(10.0,10.0);
+    //  bBfaces[0]+=tempSize;
+    //    faceRect+=tempSize;
+    face=cv::Mat(cv_ptr->image,faceRect).clone();
+    faceImage = cv_bridge::CvImage(std_msgs::Header(), "rgb8", face).toImageMsg();
+    pub.publish(faceImage);
+
   }
 
   if (notValidFaces.NoFaces>0){
@@ -136,9 +151,13 @@ int main(int argc, char **argv)
   cvDiaInitPeopleDet(40/imgRedFactor,100/imgRedFactor,haarCascade);
   
   sub = _nh.subscribe(topic, 1, faceDetectCallback);
+
   _pub1=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
   _pub2=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
   
+  image_transport::ImageTransport it(_nh);
+  pub = it.advertise("faceDetection/faceImg", 1);
+ 
   while (ros::ok())
     { 
       ros::spinOnce();

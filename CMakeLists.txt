@@ -10,8 +10,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   uv_msgs
+  sensor_msgs
   cv_bridge
   message_generation
+  image_transport
 )
 
 ## System dependencies are found with CMake's conventions
@@ -109,7 +111,7 @@ set(LIBS ${DIALIBS} ${LIBS})
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES uv_face_detect
-CATKIN_DEPENDS roscpp rospy std_msgs uv_msgs message_runtime
+CATKIN_DEPENDS roscpp rospy std_msgs uv_msgs sensor_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -131,7 +133,7 @@ CATKIN_DEPENDS roscpp rospy std_msgs uv_msgs message_runtime
 # )
 
 ## Declare a cpp executable
-add_executable(uv_glip_face_detect src/uv_glip_face_detect.cpp)
+#add_executable(uv_glip_face_detect src/uv_glip_face_detect.cpp)
 add_executable(uv_face_detect src/uv_face_detect.cpp)
 
 #add_executable(uv_3DfaceSegment src/uv_3DFaceSegment.cpp)
@@ -140,9 +142,9 @@ add_executable(uv_face_detect src/uv_face_detect.cpp)
 #add_dependencies(uv_face_detect uv_face_detect_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(uv_glip_face_detect
-  ${catkin_LIBRARIES} ${LIBS} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} m 
-)
+#target_link_libraries(uv_glip_face_detect
+#  ${catkin_LIBRARIES} ${LIBS} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} m 
+#)
 
 target_link_libraries(uv_face_detect
   ${catkin_LIBRARIES} ${LIBS} 
