@@ -10,8 +10,8 @@
 #include <opencv/cv.h>
 #include <iostream>
 #include <stdio.h>
-#include <uv_msgs/FacesDetected.h>
 #include <uv_msgs/ImageBoundingBox.h>
+#include <uv_msgs/ImageBoundingBoxListStamped.h>
 
 #define default_ID "camera"
 #define default_topic "/camera/rgb/image_rect_color"
@@ -30,8 +30,10 @@ CvRect *bBfaces,*rectNoFaces;
 Mat image,face;
 char haarCascade[]="/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml";
 
-uv_msgs::FacesDetected faces;
-uv_msgs::FacesDetected notValidFaces;
+// uv_msgs::FacesDetected faces;
+// uv_msgs::FacesDetected notValidFaces;
+uv_msgs::ImageBoundingBoxListStamped faces;
+uv_msgs::ImageBoundingBoxListStamped notValidFaces;
 uv_msgs::ImageBoundingBox  bBoxfaces;
 sensor_msgs::ImagePtr faceImage; 
 
@@ -68,14 +70,14 @@ int getFacesData()
   if (peopleFound>0){
     for(i=0;i<peopleFound;i++) {
       fillFacesBoundingBoxes(bBfaces[i]);
-      faces.faces.push_back(bBoxfaces);
+      faces.boxes.push_back(bBoxfaces);
     }
   }
 
   if (notValidtd>0){
     for(i=0;i<notValidtd;i++) {
       fillFacesBoundingBoxes(rectNoFaces[i]);
-      notValidFaces.faces.push_back(bBoxfaces);
+      notValidFaces.boxes.push_back(bBoxfaces);
     }
   }
   return 0;
@@ -108,16 +110,16 @@ void faceDetectCallback(const sensor_msgs::ImageConstPtr& msg)
   peopleFound=cvDiaFindFaces(iplImg,&nFaces,&bBfaces,&rectNoFaces);
 
   notValidtd=nFaces-peopleFound;
-  faces.NoFaces=peopleFound;
-  notValidFaces.NoFaces=notValidtd;
+  faces.NoBoxes=peopleFound;
+  notValidFaces.NoBoxes=notValidtd;
 
   double time = ros::Time::now().toSec();
-  if (faces.NoFaces>0){
+  if (faces.NoBoxes>0){
     faces.header.stamp=ros::Time(time);
     faces.header.frame_id=default_ID;
     getFacesData();
     _pub1.publish(faces);
-    faces.faces.clear(); 
+    faces.boxes.clear(); 
     faceRect=Rect(bBfaces[0].x*2,bBfaces[0].y*2,bBfaces[0].width*2,bBfaces[0].height*2);
     //   Size tempSize=cvSize(10.0,10.0);
     //  bBfaces[0]+=tempSize;
@@ -128,12 +130,12 @@ void faceDetectCallback(const sensor_msgs::ImageConstPtr& msg)
 
   }
 
-  if (notValidFaces.NoFaces>0){
+  if (notValidFaces.NoBoxes>0){
     notValidFaces.header.stamp=ros::Time(time);
     notValidFaces.header.frame_id=default_ID;
     getFacesData();
     _pub2.publish(notValidFaces);
-    notValidFaces.faces.clear(); 
+    notValidFaces.boxes.clear(); 
   }
 }
 
@@ -152,8 +154,11 @@ int main(int argc, char **argv)
   
   sub = _nh.subscribe(topic, 1, faceDetectCallback);
 
-  _pub1=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
-  _pub2=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
+  // _pub1=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
+  // _pub2=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
+
+  _pub1=_nh.advertise<uv_msgs::ImageBoundingBoxListStamped>("/faceDetection/validFaces",100);
+  _pub2=_nh.advertise<uv_msgs::ImageBoundingBoxListStamped>("/faceDetection/notValidFaces",100);
   
   image_transport::ImageTransport it(_nh);
   pub = it.advertise("faceDetection/faceImg", 1);

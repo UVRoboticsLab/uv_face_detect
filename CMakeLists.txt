@@ -27,16 +27,16 @@ link_directories(${OpenCV_LIBRARY_DIRS})
 set (LIBS ${LIBS} ${OpenCV_LIBS})
 
 #GLUT libraries
-find_package(GLUT REQUIRED)
-find_package(OpenGL REQUIRED)
-include_directories(${GLUT_INCLUDE_DIRS})
-link_directories(${GLUT_LIBRARY_DIRS})
-add_definitions(${GLUT_DEFINITIONS})
+#find_package(GLUT REQUIRED)
+#find_package(OpenGL REQUIRED)
+#include_directories(${GLUT_INCLUDE_DIRS})
+#link_directories(${GLUT_LIBRARY_DIRS})
+#add_definitions(${GLUT_DEFINITIONS})
 
-#DIA libraries (gl3DCommon)
+#DIA libraries (cvDIA)
 include_directories(/usr/local/dia/include)
 link_directories(/usr/local/dia/lib)
-set(DIALIBS glip cvDia)
+set(DIALIBS cvDia)
 set(LIBS ${DIALIBS} ${LIBS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
