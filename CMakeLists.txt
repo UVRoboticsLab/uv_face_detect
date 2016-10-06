@@ -33,11 +33,11 @@ set (LIBS ${LIBS} ${OpenCV_LIBS})
 #link_directories(${GLUT_LIBRARY_DIRS})
 #add_definitions(${GLUT_DEFINITIONS})
 
-#DIA libraries (cvDIA)
-include_directories(/usr/local/dia/include)
-link_directories(/usr/local/dia/lib)
-set(DIALIBS cvDia)
-set(LIBS ${DIALIBS} ${LIBS})
+#DIA libraries (cvUV)
+include_directories(/usr/local/uv_libs/include)
+link_directories(/usr/local/uv_libs/lib)
+set(UV_LIBS cvUV)
+set(LIBS ${UV_LIBS} ${LIBS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
