@@ -30,8 +30,6 @@ CvRect *bBfaces,*rectNoFaces;
 Mat image,face;
 char haarCascade[]="/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml";
 
-// uv_msgs::FacesDetected faces;
-// uv_msgs::FacesDetected notValidFaces;
 uv_msgs::ImageBoundingBoxListStamped faces;
 uv_msgs::ImageBoundingBoxListStamped notValidFaces;
 uv_msgs::ImageBoundingBox  bBoxfaces;
@@ -153,9 +151,6 @@ int main(int argc, char **argv)
   cvUVInitPeopleDet(40/imgRedFactor,100/imgRedFactor,haarCascade);
   
   sub = _nh.subscribe(topic, 1, faceDetectCallback);
-
-  // _pub1=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/validFaces",100);
-  // _pub2=_nh.advertise<uv_msgs::FacesDetected>("/faceDetection/notValidFaces",100);
 
   _pub1=_nh.advertise<uv_msgs::ImageBoundingBoxListStamped>("/faceDetection/validFaces",100);
   _pub2=_nh.advertise<uv_msgs::ImageBoundingBoxListStamped>("/faceDetection/notValidFaces",100);
