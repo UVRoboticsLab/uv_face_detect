@@ -35,7 +35,7 @@ set (LIBS ${LIBS} ${OpenCV_LIBS})
 
 #DIA libraries (cvUV)
 include_directories(/usr/local/uv_libs/include)
-link_directories(/usr/local/amarin/uv_libs/lib)
+link_directories(/usr/local/uv_libs/lib)
 set(UV_LIBS cvUV)
 set(LIBS ${UV_LIBS} ${LIBS})
 
