@@ -6,7 +6,8 @@
 #include <image_transport/image_transport.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include <cvUV.h>
+//#include <cvUV.h>
+#include <cvDia.h>
 #include <opencv/cv.h>
 #include <iostream>
 #include <stdio.h>
@@ -105,7 +106,7 @@ void faceDetectCallback(const sensor_msgs::ImageConstPtr& msg)
   iplImg=cvCreateImage(cvSize(width/2,height/2),IPL_DEPTH_8U,3);
   resize(cv_ptr->image,tempImg,cvSize(width/2,height/2));//,0,0,CV_INTER_LINEAR);  
   iplImg->imageData = (char *) tempImg.data;
-  peopleFound=cvUVFindFaces(iplImg,&nFaces,&bBfaces,&rectNoFaces);
+  peopleFound=cvDiaFindFaces(iplImg,&nFaces,&bBfaces,&rectNoFaces);
 
   notValidtd=nFaces-peopleFound;
   faces.NoBoxes=peopleFound;
@@ -148,7 +149,7 @@ int main(int argc, char **argv)
   _nh.getParam("uv_face_detect/image",topic);
   if (topic.size()==0) topic=default_topic;
 
-  cvUVInitPeopleDet(40/imgRedFactor,100/imgRedFactor,haarCascade);
+  cvDiaInitPeopleDet(40/imgRedFactor,100/imgRedFactor,haarCascade);
   
   sub = _nh.subscribe(topic, 1, faceDetectCallback);
 

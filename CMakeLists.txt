@@ -36,7 +36,7 @@ set (LIBS ${LIBS} ${OpenCV_LIBS})
 #DIA libraries (cvUV)
 include_directories(/usr/local/uv_libs/include)
 link_directories(/usr/local/uv_libs/lib)
-set(UV_LIBS cvUV)
+set(UV_LIBS cvDia)
 set(LIBS ${UV_LIBS} ${LIBS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
