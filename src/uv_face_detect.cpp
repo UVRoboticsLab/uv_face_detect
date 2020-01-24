@@ -144,7 +144,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "uv_face_detect");  
   ros::NodeHandle _nh;
-  string topic;
+  std::string topic;
 
   _nh.getParam("uv_face_detect/image",topic);
   if (topic.size()==0) topic=default_topic;

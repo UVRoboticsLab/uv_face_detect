@@ -1,19 +1,21 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(uv_face_detect)
 
+## Compile as C++11, supported in ROS Kinetic and newer
+# add_compile_options(-std=c++11)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  cv_bridge
+  geometry_msgs
+  image_transport
   roscpp
   rospy
-  std_msgs
-  geometry_msgs
-  uv_msgs
   sensor_msgs
-  cv_bridge
-  message_generation
-  image_transport
+  std_msgs
+  uv_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -26,18 +28,12 @@ include_directories(/usr/local/share/opencv/haarcascade/)
 link_directories(${OpenCV_LIBRARY_DIRS})
 set (LIBS ${LIBS} ${OpenCV_LIBS})
 
-#GLUT libraries
-#find_package(GLUT REQUIRED)
-#find_package(OpenGL REQUIRED)
-#include_directories(${GLUT_INCLUDE_DIRS})
-#link_directories(${GLUT_LIBRARY_DIRS})
-#add_definitions(${GLUT_DEFINITIONS})
-
 #DIA libraries (cvUV)
 include_directories(/usr/local/uv_libs/include)
 link_directories(/usr/local/uv_libs/lib)
 set(UV_LIBS cvDia)
 set(LIBS ${UV_LIBS} ${LIBS})
+
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -53,11 +49,11 @@ set(LIBS ${UV_LIBS} ${LIBS})
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
 ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
 ## * In the file package.xml:
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependencies might have been
-##     pulled in transitively but can be declared for certainty nonetheless:
-##     * add a build_depend tag for "message_generation"
-##     * add a run_depend tag for "message_runtime"
+##   * add a build_depend tag for "message_generation"
+##   * add a build_depend and a exec_depend tag for each package in MSG_DEP_SET
+##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
+##     but can be declared for certainty nonetheless:
+##     * add a exec_depend tag for "message_runtime"
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
 ##     find_package(catkin REQUIRED COMPONENTS ...)
@@ -71,8 +67,8 @@ set(LIBS ${UV_LIBS} ${LIBS})
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   bBox.msg
-#   FaceDetected.msg
+#   Message1.msg
+#   Message2.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -88,15 +84,31 @@ set(LIBS ${UV_LIBS} ${LIBS})
 #   Action1.action
 #   Action2.action
 # )
-#generate_dynamic_reconfigure_options( cfg/pkg_parameters.cfg) 
-#include_directories() 
-#gencfg()
+
 ## Generate added messages and services with any dependencies listed here
-#generate_messages(
+# generate_messages(
 #   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-#   geometry_msgs
-#   uv_face_detect
+#   geometry_msgs#   sensor_msgs#   std_msgs#   uv_msgs
+# )
+
+################################################
+## Declare ROS dynamic reconfigure parameters ##
+################################################
+
+## To declare and build dynamic reconfigure parameters within this
+## package, follow these steps:
+## * In the file package.xml:
+##   * add a build_depend and a exec_depend tag for "dynamic_reconfigure"
+## * In this file (CMakeLists.txt):
+##   * add "dynamic_reconfigure" to
+##     find_package(catkin REQUIRED COMPONENTS ...)
+##   * uncomment the "generate_dynamic_reconfigure_options" section below
+##     and list every .cfg file to be processed
+
+## Generate dynamic reconfigure parameters in the 'cfg' folder
+# generate_dynamic_reconfigure_options(
+#   cfg/DynReconf1.cfg
+#   cfg/DynReconf2.cfg
 # )
 
 ###################################
@@ -104,14 +116,14 @@ set(LIBS ${UV_LIBS} ${LIBS})
 ###################################
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
+## INCLUDE_DIRS: uncomment this if your package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES uv_face_detect
-CATKIN_DEPENDS roscpp rospy std_msgs uv_msgs sensor_msgs message_runtime
+#  LIBRARIES uv_face
+  CATKIN_DEPENDS cv_bridge geometry_msgs image_transport roscpp rospy sensor_msgs std_msgs uv_msgs
 #  DEPENDS system_lib
 )
 
@@ -121,38 +133,43 @@ CATKIN_DEPENDS roscpp rospy std_msgs uv_msgs sensor_msgs message_runtime
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
-#include_directories(
-#  ${catkin_INCLUDE_DIRS}
-#  ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake
-#)
+include_directories(
+# include
+  ${catkin_INCLUDE_DIRS}
+)
 
-## Declare a cpp library
-# add_library(uv_face_detect
-#   src/${PROJECT_NAME}/uv_face_detect.cpp
+## Declare a C++ library
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/uv_face.cpp
 # )
 
-## Declare a cpp executable
+## Add cmake target dependencies of the library
+## as an example, code may need to be generated before libraries
+## either from message generation or dynamic reconfigure
+# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Declare a C++ executable
+## With catkin_make all packages are built within a single CMake context
+## The recommended prefix ensures that target names across packages don't collide
+
 #add_executable(uv_glip_face_detect src/uv_glip_face_detect.cpp)
 add_executable(uv_face_detect src/uv_face_detect.cpp)
-
 #add_executable(uv_3DfaceSegment src/uv_3DFaceSegment.cpp)
-## Add cmake target dependencies of the executable/library
-## as an example, message headers may need to be generated before nodes
-#add_dependencies(uv_face_detect uv_face_detect_gencfg)
+
+## Rename C++ executable without prefix
+## The above recommended prefix causes long target names, the following renames the
+## target back to the shorter version for ease of user use
+## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
+# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+
+## Add cmake target dependencies of the executable
+## same as for the library above
+# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-#target_link_libraries(uv_glip_face_detect
-#  ${catkin_LIBRARIES} ${LIBS} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} m 
-#)
-
 target_link_libraries(uv_face_detect
-  ${catkin_LIBRARIES} ${LIBS} 
-)
-#target_link_libraries(uv_3DfaceSegment
-#   ${catkin_LIBRARIES} ${LIBS} m 
-#)
-
+   ${catkin_LIBRARIES} ${LIBS}
+ )
 
 #############
 ## Install ##
@@ -168,11 +185,18 @@ target_link_libraries(uv_face_detect
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-## Mark executables and/or libraries for installation
-# install(TARGETS uv_face_detect uv_face_detect_node
+## Mark executables for installation
+## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
+# install(TARGETS ${PROJECT_NAME}_node
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+
+## Mark libraries for installation
+## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
+# install(TARGETS ${PROJECT_NAME}
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 # )
 
 ## Mark cpp header files for installation
@@ -194,7 +218,7 @@ target_link_libraries(uv_face_detect
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_uv_face_detect.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_uv_face.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
